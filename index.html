@@ -12,10 +12,80 @@
       width: 100%;
       height: 100%;
     }
+	#selectionCircle, #infoBox, #crosshair {
+	  display: none;
+	}
+
+	#selectionCircle {
+	  position: absolute;
+	  top: 50%;
+	  left: 50%;
+	  transform: translate(-50%, -50%);
+	  width: min(90vw, 90vh);
+	  height: min(90vw, 90vh);
+	  border: 4px dashed black;
+	  border-radius: 50%;
+	  pointer-events: none;
+	  z-index: 10;
+	  display: none;
+	}
+
+	#crosshair {
+	  position: absolute;
+	  top: 50%;
+	  left: 50%;
+	  width: 40px;      /* długość ramion krzyża */
+	  height: 40px;
+	  transform: translate(-50%, -50%);
+	  pointer-events: none;
+	  z-index: 11;
+	}
+
+	#crosshair::before,
+	#crosshair::after {
+	  content: '';
+	  position: absolute;
+	  background: black;
+	}
+
+	#crosshair::before {
+	  top: 50%;
+	  left: 0;
+	  right: 0;
+	  height: 2px;          /* grubość poziomej linii */
+	  transform: translateY(-50%);
+	}
+
+	#crosshair::after {
+	  top: 0;
+	  bottom: 0;
+	  left: 50%;
+	  width: 2px;           /* grubość pionowej linii */
+	  transform: translateX(-50%);
+	}
+
+	#infoBox {
+	  position: absolute;
+	  top: 10px;
+	  left: 50%;
+	  transform: translateX(-50%);
+	  background-color: rgba(0, 0, 0, 0.7);
+	  color: white;
+	  padding: 10px 16px;
+	  border-radius: 10px;
+	  z-index: 20;
+	  font-size: 16px;
+	  text-align: center;
+	  cursor: pointer;
+	}
+
   </style>
 </head>
 <body>
   <div id="map"></div>
+  <div id="selectionCircle"></div>
+  <div id="crosshair"></div>
+  <div id="infoBox">Kliknij tutaj, aby wybrać to miejsce</div>
 
   <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
   <script src="https://unpkg.com/jsts@2.6.1/dist/jsts.min.js"></script>
@@ -222,6 +292,35 @@
 	  const coord = ol.proj.fromLonLat([lo, la]);
 	  view.animate({center: coord, duration: 500});
 	}
+	
+	let trybWybierania = false;
+
+	function set_center() {
+	  trybWybierania = true;
+	  document.getElementById('selectionCircle').style.display = 'block';
+	  document.getElementById('crosshair').style.display = 'block';
+	  document.getElementById('infoBox').style.display = 'block';
+	}
+	
+
+	
+	document.getElementById('infoBox').addEventListener('click', () => {
+	  if (!trybWybierania) return;
+
+	  const center = ol.proj.toLonLat(map.getView().getCenter());
+	  const lon = center[0].toFixed(6);
+	  const lat = center[1].toFixed(6);
+	  const result = `${lon}#${lat}`;
+
+	  if (window.AppInventor) {
+		window.AppInventor.setWebViewString(result);
+	  } 
+
+	  trybWybierania = false;
+	  document.getElementById('selectionCircle').style.display = 'none';
+	  document.getElementById('crosshair').style.display = 'none';
+	  document.getElementById('infoBox').style.display = 'none';
+	});
 
 
    	markersLayer.setZIndex(999);
