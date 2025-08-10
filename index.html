@@ -216,7 +216,7 @@
 	  const radius = promienMetry;
 
 	  const points = [];
-	  const numPoints = 64;
+	  const numPoints = 128;
 
 	  for (let i = 0; i < numPoints; ++i) {
 		const angleDeg = (360 * i) / numPoints;
@@ -276,6 +276,7 @@
     function rm_point(nazwaPliku) {
       if (markerStore[nazwaPliku]) {
         markersLayer.getSource().removeFeature(markerStore[nazwaPliku]);
+		delete markerStore[nazwaPliku];
       }
     }
 	
@@ -394,3 +395,4 @@
 </body>
 
 </html>
+
